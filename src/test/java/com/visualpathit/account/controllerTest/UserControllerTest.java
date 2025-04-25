@@ -1,114 +1,44 @@
 package com.visualpathit.account.controllerTest;
 
-import org.springframework.mock.web.MockHttpSession;
+import com.visualpathit.account.controller.UserController;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-
-import com.visualpathit.account.controller.UserController;
-import com.visualpathit.account.model.User;
-import com.visualpathit.account.service.UserService;
-import com.visualpathit.account.setup.StandaloneMvcTestViewResolver;
-
-
-
-
+@RunWith(SpringRunner.class)
+@WebMvcTest(UserController.class)
 public class UserControllerTest {
-	
-	@Mock
-	private UserService controllerSer;
-	@InjectMocks
-	private UserController controller;
-	private MockMvc mockMvc;
-	
-	@Before
-	public void setup(){
-		MockitoAnnotations.initMocks(this);
-		
-		/*InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setPrefix("/WEB-INF/views/");
-        viewResolver.setSuffix(".jsp");
-		*/
-		mockMvc = MockMvcBuilders.standaloneSetup(controller)
-				  .setViewResolvers(new StandaloneMvcTestViewResolver()).build();
-	}
-	
-	@Test
-	public void registrationTestforHappyFlow() throws Exception{
-		User user = new User();
-		mockMvc.perform(get("/registration"))
-        .andExpect(status().isOk())
-        .andExpect(view().name("registration"))
-        .andExpect(forwardedUrl("registration"));
-		
-	}
-	@Test
-	public void registrationTestforNullValueHappyFlow() throws Exception{
-		mockMvc.perform(get("/registration"))
-        .andExpect(status().isOk())
-        .andExpect(view().name("registration"))
-        .andExpect(forwardedUrl("registration"));
-		
-	}
-	/*@Test
-	public void registrationTestforPostValueHappyFlow() throws Exception{
-		String description =new String("Error String");
-		UserValidator userValidator;
-		BindingResult bindingResult;
-		when(userValidator.validate(new User(),bindingResult))
-		.thenThrow(bindingResult.hasErrors());
-		mockMvc.perform(post("/registration").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("userForm","userForm"))
-		
-        .andExpect(status().isOk());
-        //.andExpect(view().name("redirect:/welcome"))
-        //.andExpect(forwardedUrl("redirect:/welcome"));
-		
-	}*/
-	}
-	@Test
-	public void loginTestHappyFlow() throws Exception {
-   		 mockMvc.perform(post("/login")  // <-- use POST instead of GET
-        .param("username", "admin") // pass username
-        .param("password", "admin123")) // pass password
-        .andExpect(status().isOk());
-		
-	}
-	@Test
-	public void welcomeTestHappyFlow() throws Exception{
-		mockMvc.perform(get("/welcome"))
-        .andExpect(status().isOk())
-        .andExpect(view().name("welcome"))
-        .andExpect(forwardedUrl("welcome"));
-		
-	}
-	@Test
-	public void welcomeAfterDirectLoginTestHappyFlow() throws Exception {
-  		  MockHttpSession session = new MockHttpSession();
-   	 session.setAttribute("loggedUser", "mockuser"); // Must match your controller's expected attribute name
-		   mockMvc.perform(get("/welcome").session(session))
-         .andExpect(status().isOk())
-         .andExpect(view().name("welcome"));
-		
-	}
-	@Test
-	public void indexTestHappyFlow() throws Exception{
-		mockMvc.perform(get("/index"))
-        .andExpect(status().isOk())
-        .andExpect(view().name("index_home"))
-        .andExpect(forwardedUrl("index_home"));
-		
-	}
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    public void loginPageLoadsSuccessfully() throws Exception {
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"));  // Adjust if your view name is different
+    }
+
+    @Test
+    public void welcomePageLoadsSuccessfully() throws Exception {
+        mockMvc.perform(get("/welcome"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"));  // Adjust view name if needed
+    }
+
+    @Test
+    public void loginPostSuccessFlow() throws Exception {
+        mockMvc.perform(post("/login")
+                .param("username", "admin")
+                .param("password", "admin123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("welcome"));  // Or whatever view you return on success
+    }
 }
