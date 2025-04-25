@@ -1,5 +1,6 @@
 package com.visualpathit.account.controllerTest;
 
+import org.springframework.mock.web.MockHttpSession;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
@@ -92,14 +93,13 @@ public class UserControllerTest {
         .andExpect(forwardedUrl("welcome"));
 		
 	}
+	@Test
 	public void welcomeAfterDirectLoginTestHappyFlow() throws Exception {
-    	// Simulate a logged-in user in session
-    	MockHttpSession session = new MockHttpSession();
-    		session.setAttribute("loggedUser", "mockuser"); 
-    	// "loggedUser" must match the attribute your controller expects
-    		mockMvc.perform(get("/welcome").session(session))
-        .andExpect(status().isOk())
-        .andExpect(view().name("welcome"));
+  		  MockHttpSession session = new MockHttpSession();
+   	 session.setAttribute("loggedUser", "mockuser"); // Must match your controller's expected attribute name
+		   mockMvc.perform(get("/welcome").session(session))
+         .andExpect(status().isOk())
+         .andExpect(view().name("welcome"));
 		
 	}
 	@Test
